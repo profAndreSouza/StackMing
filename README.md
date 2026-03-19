@@ -1,5 +1,7 @@
 # Stack MING para uso em IIoT
 
+[Playlist](https://youtube.com/playlist?list=PLYUDPcYmk9tggQ49qUaT2xgWDaMKuItP2&si=0quPM35jObXRDQuo)
+
 ```mermaid
 flowchart LR
     subgraph Device Layer
