@@ -1,24 +1,24 @@
-# Stack MING - Para uso em IIOT
+# Stack MING para uso em IIoT
 
 ```mermaid
 flowchart LR
     subgraph Device Layer
-        A[Device
-        Hardware]
+        A[Dispositivos IoT
+        Sensores / CLPs]
     end
     
-    subgraph IOT Platform - Stack MING
+    subgraph Plataforma IIoT - Stack MING
 
-        subgraph Messaging Layer
+        subgraph Comunicação
             B[MQTT Broker]
         end
-        subgraph Process Layer
+        subgraph Processamento
             C[Node-RED]
         end
-        subgraph Data Layer
+        subgraph Armazenamento
             D[InfluxDB]
         end
-        subgraph Presentation Layer
+        subgraph Visualização
             E[Grafana]
         end
     end
@@ -29,90 +29,63 @@ flowchart LR
     D --> E
 ```
 
-A **Stack MING** é uma arquitetura amplamente utilizada em soluções de **IIoT (Industrial Internet of Things)** para coleta, processamento, armazenamento e visualização de dados provenientes de sensores e dispositivos industriais.
+A Stack MING é uma arquitetura utilizada em soluções de IIoT (Industrial Internet of Things) para coleta, processamento, armazenamento e visualização de dados provenientes de sensores e dispositivos industriais.
+Ela organiza o sistema em camadas bem definidas, facilitando a integração entre tecnologias e permitindo que cada componente tenha uma responsabilidade específica dentro da solução.
 
-O nome **MING** representa as quatro tecnologias principais utilizadas na arquitetura:
+O nome MING representa as quatro tecnologias principais utilizadas na arquitetura.
 
 | Letra | Tecnologia | Função                                     |
 | ----- | ---------- | ------------------------------------------ |
-| **M** | MQTT       | Comunicação entre dispositivos             |
-| **I** | InfluxDB   | Armazenamento de dados de séries temporais |
-| **N** | Node-RED   | Processamento e integração dos dados       |
-| **G** | Grafana    | Visualização e monitoramento               |
+| M     | MQTT       | Comunicação entre dispositivos             |
+| I     | InfluxDB   | Armazenamento de dados de séries temporais |
+| N     | Node-RED   | Processamento e integração de dados        |
+| G     | Grafana    | Visualização e monitoramento               |
 
----
-
-# Fluxo de dados da Stack
+Fluxo de dados da Stack
 
 O fluxo típico de dados ocorre da seguinte forma:
 
-**Dispositivo → MQTT → Node-RED → InfluxDB → Grafana**
+Dispositivo → MQTT → Node-RED → InfluxDB → Grafana
 
 Etapas do fluxo:
 
-1. **Dispositivos IoT** coletam dados de sensores
-2. Os dados são **publicados em tópicos MQTT**
-3. **Node-RED** consome os dados
-4. Os dados são **processados e transformados**
-5. Os dados são armazenados no **InfluxDB**
-6. O **Grafana** consulta o banco e exibe dashboards
+1. Dispositivos IoT coletam dados de sensores
+2. Os dados são publicados em tópicos MQTT
+3. Node-RED consome as mensagens do broker
+4. Os dados são processados e transformados
+5. As informações são armazenadas no InfluxDB
+6. O Grafana consulta o banco de dados e exibe dashboards
 
-Essa arquitetura separa claramente as responsabilidades de cada componente.
+Essa separação permite que o sistema seja modular e mais fácil de escalar.
 
----
+M - MQTT
 
-# M - MQTT
+Message Queuing Telemetry Transport
 
-## Message Queuing Telemetry Transport
+O MQTT é um protocolo de comunicação leve, criado para funcionar bem em ambientes com pouca largura de banda, redes instáveis e dispositivos com baixo poder de processamento. Por esse motivo, é muito utilizado em projetos de IoT e IIoT.
 
-O **MQTT** é um protocolo de comunicação extremamente leve, criado para ambientes com:
+Diferente do modelo tradicional utilizado em aplicações web, onde ocorre uma requisição direta entre cliente e servidor, o MQTT utiliza o modelo publish/subscribe.
 
-* **baixo consumo de energia**
-* **baixa largura de banda**
-* **redes instáveis**
-* **dispositivos com poucos recursos**
+Comunicação assíncrona
 
-Por isso ele é amplamente utilizado em **IoT e IIoT**.
+No MQTT os dispositivos não se comunicam diretamente entre si.
+Todos os clientes se conectam a um broker MQTT, que atua como intermediário responsável por receber e distribuir as mensagens.
 
-Diferente do **HTTP**, que segue o modelo **request-response**, o MQTT utiliza o modelo **publish/subscribe**.
+Esse modelo cria um ambiente desacoplado e escalável.
 
----
+Broker MQTT
 
-# Comunicação Assíncrona
-
-No MQTT os dispositivos **não se comunicam diretamente**.
-
-Todos os clientes se conectam a um **broker MQTT**, que é responsável por:
-
-* receber mensagens
-* filtrar mensagens
-* entregar mensagens aos interessados
-
-Isso cria um sistema **desacoplado e escalável**.
-
----
-
-# Broker MQTT
-
-O **Broker** é o servidor central responsável por:
-
-* receber mensagens dos publishers
-* identificar o tópico
-* enviar a mensagem para todos os subscribers interessados
+O broker é o servidor central da comunicação MQTT. Ele recebe mensagens dos dispositivos, identifica o tópico associado à mensagem e entrega essa informação para todos os clientes que estão inscritos naquele tópico.
 
 Arquitetura simplificada:
 
 ```mermaid
 flowchart LR
-    A[cliente
-    publisher]
+    A[cliente publisher]
     B[broker]
-    C[cliente 1
-    subscriber]
-    D[cliente 2
-    subscriber]
-    E[cliente 3
-    subscriber]
+    C[cliente subscriber 1]
+    D[cliente subscriber 2]
+    E[cliente subscriber 3]
 
     A --> B
     B --> C
@@ -120,39 +93,31 @@ flowchart LR
     B --> E
 ```
 
----
+Tipos de clientes MQTT
 
-# Tipos de Clientes MQTT
+Existem dois papéis principais no protocolo.
 
-Existem dois papéis principais:
+Publisher
 
-## Publisher
+É o cliente responsável por enviar mensagens ao broker.
 
-Dispositivo que **publica mensagens** no broker.
+Exemplos:
+sensor de temperatura
+sensor de umidade
+CLP industrial
 
-Exemplo:
+Subscriber
 
-* sensor de temperatura
-* sensor de umidade
-* CLP industrial
+É o cliente que se inscreve em um tópico para receber mensagens publicadas.
 
----
+Exemplos:
+Node-RED
+sistemas de monitoramento
+aplicações analíticas
 
-## Subscriber
+Estrutura de tópicos
 
-Cliente que **se inscreve em um tópico** para receber mensagens.
-
-Exemplo:
-
-* Node-RED
-* Sistemas SCADA
-* Aplicações analíticas
-
----
-
-# Estrutura de Tópicos
-
-Os **tópicos MQTT** organizam as mensagens em uma estrutura hierárquica.
+Os tópicos organizam as mensagens em uma estrutura hierárquica.
 
 Exemplos:
 
@@ -163,18 +128,16 @@ sensor/umidade/lab1
 sensor/luminosidade/lab1
 ```
 
-Também é possível utilizar **wildcards**:
+Também é possível utilizar wildcards.
 
 ```
 sensor/temperatura/+
 sensor/#
 ```
 
----
+Exemplo de payload MQTT
 
-# Exemplo de Payload MQTT
-
-Um sensor pode publicar a seguinte mensagem:
+Um dispositivo pode enviar uma mensagem como esta:
 
 ```json
 {
@@ -186,115 +149,70 @@ Um sensor pode publicar a seguinte mensagem:
 }
 ```
 
-Essa mensagem pode ser publicada no tópico:
+Essa mensagem poderia ser publicada no tópico:
 
 ```
 sensor/lab1/leituras
 ```
 
----
+Quality of Service (QoS)
 
-# Quality of Service (QoS)
+O MQTT define níveis de garantia de entrega de mensagens.
 
-O MQTT define três níveis de garantia de entrega.
+QoS 0 — At most once
+A mensagem é enviada apenas uma vez, sem confirmação de recebimento.
+Possui menor latência, mas pode ocorrer perda de mensagens.
 
-## QoS 0 — At most once
+QoS 1 — At least once
+A mensagem é reenviada até que o broker confirme o recebimento.
+Garante entrega, porém pode ocorrer duplicação.
 
-A mensagem é enviada **uma única vez**, sem confirmação.
+QoS 2 — Exactly once
+Garante que a mensagem será entregue exatamente uma vez.
+Possui maior confiabilidade, porém gera maior overhead e latência.
 
-Equivalente ao comportamento de **UDP**.
+Principais brokers MQTT
 
-Vantagem:
+Alguns brokers bastante utilizados em projetos de IoT são:
 
-* menor latência
+Eclipse Mosquitto
+HiveMQ
+EMQX
+AWS IoT Core
 
-Desvantagem:
+Em ambientes educacionais e laboratoriais, o Mosquitto é muito utilizado por ser leve e fácil de executar em Docker ou servidores locais.
 
-* pode ocorrer perda de mensagem
+Bibliotecas MQTT
 
----
+Algumas bibliotecas populares utilizadas no desenvolvimento de aplicações são:
 
-## QoS 1 — At least once
+Eclipse Paho
+MQTT.js
+paho-mqtt para Python
 
-A mensagem é enviada até que o broker confirme o recebimento.
+I - InfluxDB
 
-Vantagem:
+O InfluxDB é um banco de dados NoSQL especializado em séries temporais.
+Ele foi projetado para armazenar dados onde o tempo é um elemento fundamental da informação.
 
-* entrega garantida
+Exemplos de dados armazenados nesse tipo de banco:
 
-Desvantagem:
+temperatura
+pressão
+vibração
+consumo de energia
+telemetria de máquinas
+métricas de sistemas
 
-* pode haver duplicação de mensagens.
+Tipos de bancos NoSQL
 
----
+Existem diferentes categorias de bancos NoSQL utilizadas em sistemas modernos.
 
-## QoS 2 — Exactly once
+Documentos
 
-Garante que a mensagem será entregue **exatamente uma vez**.
+Exemplo: MongoDB
 
-Utiliza um protocolo de confirmação em quatro etapas.
-
-Vantagem:
-
-* máxima confiabilidade
-
-Desvantagem:
-
-* maior overhead e latência.
-
----
-
-# Principais Brokers MQTT
-
-Alguns dos brokers mais utilizados:
-
-* **Eclipse Mosquitto**
-* **HiveMQ**
-* **EMQX**
-* **AWS IoT Core**
-
-O **Mosquitto** é muito utilizado em ambientes educacionais e laboratoriais por ser leve e fácil de executar em **Docker ou servidores locais**.
-
----
-
-# Bibliotecas MQTT
-
-Algumas bibliotecas populares:
-
-* **Eclipse Paho**
-* **MQTT.js**
-* **Python paho-mqtt**
-
----
-
-# I - InfluxDB
-
-O **InfluxDB** é um banco de dados **NoSQL especializado em séries temporais (Time Series Database - TSDB)**.
-
-Ele foi projetado para armazenar dados que possuem **tempo como dimensão principal**.
-
-Exemplos de dados típicos:
-
-* temperatura
-* pressão
-* vibração
-* consumo energético
-* métricas de servidores
-* telemetria industrial
-
----
-
-# Tipos de Bancos NoSQL
-
-Existem vários tipos de bancos NoSQL.
-
----
-
-# Documentos
-
-Exemplo: **MongoDB**
-
-Estrutura baseada em documentos JSON.
+A estrutura é baseada em documentos JSON.
 
 ```json
 {
@@ -308,29 +226,14 @@ Estrutura baseada em documentos JSON.
     {
       "ddd": 15,
       "numero": "98888-1111"
-    },
-    {
-      "ddd": 15,
-      "numero": "97777-2222"
     }
   ]
 }
 ```
 
-Outro documento pode possuir estrutura diferente:
+Chave-valor
 
-```json
-{
-  "id": 1002,
-  "cliente": "Fernanda"
-}
-```
-
----
-
-# Chave-Valor
-
-Exemplo: **Amazon DynamoDB** ou **Redis**
+Exemplo: Redis ou DynamoDB
 
 ```json
 {
@@ -340,78 +243,59 @@ Exemplo: **Amazon DynamoDB** ou **Redis**
 }
 ```
 
----
+Séries temporais
 
-# Séries Temporais
+Exemplos:
 
-Exemplo:
+InfluxDB
+TimescaleDB
+Prometheus
 
-* **InfluxDB**
-* **TimescaleDB**
-* **Prometheus**
+Esses bancos são otimizados para consultas baseadas em tempo.
 
-Esses bancos são otimizados para consultas baseadas em **tempo**.
+Estrutura de dados no InfluxDB
 
----
+Os principais elementos utilizados são:
 
-# Estrutura de Dados no InfluxDB
+| Estrutura   | Equivalente aproximado em banco relacional |
+| ----------- | ------------------------------------------ |
+| Bucket      | Banco de dados                             |
+| Measurement | Tabela                                     |
+| Tag         | Coluna indexada                            |
+| Field       | Coluna de dados                            |
+| Timestamp   | Data e hora                                |
 
-Os principais elementos do InfluxDB são:
+Measurement
 
-| Estrutura   | Equivalente relacional  |
-| ----------- | ----------------------- |
-| Bucket      | Banco de dados          |
-| Measurement | Tabela                  |
-| Tag         | Coluna indexada         |
-| Field       | Coluna de dados         |
-| Timestamp   | Data e hora do registro |
-
----
-
-# Measurement
-
-Uma **measurement** representa um conjunto de medições.
+Uma measurement representa um conjunto de medições relacionadas.
 
 Exemplo:
 
-```
 sensores
-```
 
----
+Tags
 
-# Tags
-
-As **tags** são campos indexados utilizados para **filtragem rápida**.
+As tags são campos utilizados para identificação e filtragem rápida dos dados.
 
 Exemplo:
 
-```
 sensor_id = sensor01
 local = laboratorio1
-```
 
----
+Fields
 
-# Fields
-
-Os **fields** são os valores medidos.
+Os fields representam os valores medidos.
 
 Exemplo:
 
-```
 temperatura = 24.5
 umidade = 62.1
 luminosidade = 310
-```
 
----
-
-# Exemplo de Registro no InfluxDB
+Exemplo de registro no InfluxDB
 
 Estrutura lógica:
 
-```
 measurement: sensores
 
 tags:
@@ -425,13 +309,10 @@ luminosidade = 310
 
 timestamp:
 2026-03-16T19:45:00Z
-```
 
----
+Exemplo de escrita via JSON
 
-# Exemplo de Escrita via JSON
-
-No **Node-RED** ou APIs do InfluxDB é comum enviar os dados nesse formato:
+Em integrações com Node-RED ou APIs do InfluxDB, os dados podem ser enviados no seguinte formato:
 
 ```json
 [
@@ -451,41 +332,21 @@ No **Node-RED** ou APIs do InfluxDB é comum enviar os dados nesse formato:
 ]
 ```
 
----
+N - Node-RED
 
-# N - Node-RED
+O Node-RED é uma ferramenta de desenvolvimento baseada em fluxos, muito utilizada em integração de sistemas, automação e IoT.
+Ele permite criar pipelines de dados de forma visual, conectando blocos chamados de nós.
 
-O **Node-RED** é uma ferramenta de programação **low-code baseada em fluxos (flow-based programming)**.
+Cada nó executa uma função específica, como:
 
-Foi criado originalmente pela **IBM** e atualmente é mantido pela **OpenJS Foundation**.
+leitura de dados via MQTT
+transformação de mensagens
+integração com APIs
+armazenamento em banco de dados
 
-Ele é muito utilizado para:
+O desenvolvedor constrói o fluxo conectando esses nós.
 
-* integração de sistemas
-* automação
-* IoT
-* pipelines de dados
-
----
-
-# Funcionamento
-
-O Node-RED utiliza uma interface gráfica baseada em **nós (nodes)**.
-
-Cada nó executa uma função específica, por exemplo:
-
-* leitura MQTT
-* transformação de dados
-* chamada HTTP
-* escrita em banco de dados
-
-O desenvolvedor cria **fluxos (flows)** conectando os nós.
-
----
-
-# Exemplo de Fluxo
-
-Fluxo típico na stack MING:
+Exemplo de fluxo na Stack MING:
 
 ```
 MQTT IN → JSON → FUNCTION → INFLUXDB OUT
@@ -493,69 +354,52 @@ MQTT IN → JSON → FUNCTION → INFLUXDB OUT
 
 Etapas:
 
-1. **MQTT IN**
-   Recebe mensagem do broker.
+MQTT IN
+Recebe a mensagem enviada pelo dispositivo através do broker.
 
-2. **JSON**
-   Converte payload para objeto.
+JSON
+Converte o payload recebido para objeto estruturado.
 
-3. **FUNCTION**
-   Processa e organiza os dados.
+FUNCTION
+Realiza tratamento ou transformação dos dados.
 
-4. **INFLUXDB OUT**
-   Armazena no banco.
+INFLUXDB OUT
+Armazena os dados no banco de séries temporais.
 
----
+G - Grafana
 
-# G - Grafana
+O Grafana é uma plataforma open source voltada para visualização e monitoramento de dados.
+Ele permite criar dashboards interativos que ajudam na análise de informações em tempo real.
 
-O **Grafana** é uma plataforma **open-source de observabilidade e visualização de dados**.
+Principais recursos
 
-Ele permite criar **dashboards interativos** para análise de dados em tempo real.
+Dashboards com diferentes tipos de visualização:
 
----
+gráficos de linha
+indicadores
+tabelas
+mapas
+alertas
 
-# Principais Características
+Integração com múltiplas fontes de dados:
 
-## Dashboards
+InfluxDB
+PostgreSQL
+MySQL
+Prometheus
+Elasticsearch
 
-Permite criar painéis com:
+Alertas
 
-* gráficos de linha
-* gauges
-* mapas
-* tabelas
-* alertas
+O Grafana permite configurar alertas automáticos baseados em condições específicas, por exemplo:
 
----
+temperatura acima de um limite
+vibração fora do padrão
+queda de comunicação de sensores
 
-## Múltiplas Fontes de Dados
+Integração com InfluxDB
 
-Grafana suporta diversos bancos:
-
-* InfluxDB
-* PostgreSQL
-* MySQL
-* Prometheus
-* Elasticsearch
-
----
-
-## Alertas
-
-Permite configurar alertas automáticos, por exemplo:
-
-* temperatura > 80°C
-* vibração acima do limite
-
----
-
-# Integração com InfluxDB
-
-O Grafana consulta o InfluxDB usando:
-
-* **InfluxQL**
-* **Flux**
+O Grafana consulta o InfluxDB utilizando linguagens de consulta como InfluxQL ou Flux.
 
 Exemplo de consulta:
 
@@ -565,14 +409,11 @@ from(bucket: "iot")
   |> filter(fn: (r) => r._measurement == "sensores")
 ```
 
----
+Benefícios da Stack MING
 
-# Benefícios da Stack MING
-
-Principais vantagens:
-
-* arquitetura **modular**
-* tecnologias **open-source**
-* alta **escalabilidade**
-* integração simples
-* ideal para **prototipação rápida em IoT**
+Arquitetura modular
+Tecnologias open source
+Alta escalabilidade
+Integração simples entre componentes
+Adequada para prototipação rápida em IoT e IIoT
+Facilidade de uso em ambientes educacionais e laboratoriais.
